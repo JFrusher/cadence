@@ -22,13 +22,13 @@ export function DayPanel() {
         label="Couple"
         value={doc.day.coupleNames}
         onChange={(coupleNames) => setDay({ coupleNames })}
-        placeholder="Charis & Alexander"
+        placeholder="Charis & Jacob"
       />
       <TextField
         label="Venue"
         value={doc.day.venueName}
         onChange={(venueName) => setDay({ venueName })}
-        placeholder="Vane House"
+        placeholder="Oving Jubilee Hall"
       />
       <Field label="Date">
         <input

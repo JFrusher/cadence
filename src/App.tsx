@@ -9,6 +9,7 @@ import { useKeyboard } from "./state/useKeyboard";
 import { Announcer } from "./ui/Announcer";
 import { Button } from "./ui/controls";
 import { DesktopGate, useIsDesktop } from "./ui/DesktopGate";
+import { Mark } from "./ui/Mark";
 import { ExportBar } from "./ui/ExportBar";
 import { ProjectButtons } from "./ui/ProjectButtons";
 import { Sidebar } from "./ui/Sidebar";
@@ -58,7 +59,10 @@ export function App() {
   return (
     <div className={styles.app}>
       <header className={styles.header}>
-        <h1 className={styles.wordmark}>Cadence</h1>
+        <span className={styles.brand}>
+          <Mark />
+          <h1 className={styles.wordmark}>Cadence</h1>
+        </span>
         <span className={styles.day}>
           {doc.day.coupleNames || "A day with no name yet"}
           {doc.day.venueName && ` · ${doc.day.venueName}`}
