@@ -59,11 +59,47 @@ describe("renderContactSheet", () => {
     expect(text).toContain("County Registrar");
   });
 
-  it("still gives a row to a tag with no details", async () => {
-    const { text } = await textOf(await renderContactSheet(sampleDoc(), options));
-    // "photo" marks photography blocks and has no contact record.
-    expect(text).toContain("photo");
+  it("still gives a row to a supplier whose details are not filled in", async () => {
+    const doc = sampleDoc();
+    const tagged = {
+      ...doc,
+      blocks: doc.blocks.map((block) =>
+        block.id === "blk-cake" ? { ...block, tags: [...block.tags, "cake maker"] } : block,
+      ),
+    };
+    const { text } = await textOf(await renderContactSheet(tagged, options));
+    expect(text).toContain("cake maker");
+    // The gap is the point: no phone, no arrival, both shown as missing.
     expect(text).toContain("—");
+  });
+
+  it("leaves out the tags the system uses to mark blocks", async () => {
+    const { text } = await textOf(await renderContactSheet(sampleDoc(), options));
+    // "photo" drives the golden-hour advisory; it is not somebody to ring.
+    expect(text).not.toContain("photo");
+  });
+
+  it("lists suppliers by the name on the page, not the tag behind it", async () => {
+    const { text } = await textOf(await renderContactSheet(sampleDoc(), options));
+    const order = ["County Cars", "County Registrar", "Eleanor Vane Photography", "Ivy & Vane", "Smith & Doyle Catering", "The Wrights"];
+    const positions = order.map((name) => text.indexOf(name));
+    expect(positions.every((at) => at >= 0)).toBe(true);
+    expect([...positions].sort((a, b) => a - b)).toEqual(positions);
+  });
+
+  it("repeats the column headings when it runs onto a second page", async () => {
+    const doc = sampleDoc();
+    const many = {
+      ...doc,
+      blocks: doc.blocks.map((block, index) =>
+        index === 0 ? { ...block, tags: Array.from({ length: 40 }, (_, i) => `supplier ${String(i).padStart(2, "0")}`) } : block,
+      ),
+    };
+    const { text, pages } = await textOf(await renderContactSheet(many, options));
+    expect(pages).toBeGreaterThan(1);
+    expect(text.split("ARRIVES").length - 1).toBe(pages);
+    expect(text).toContain("supplier 39");
+    expect(text).toContain(`Page ${pages} of ${pages}`);
   });
 
   it("leaves out a detail whose blocks have gone", async () => {
