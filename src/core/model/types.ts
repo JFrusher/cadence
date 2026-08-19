@@ -20,6 +20,13 @@ export interface Block {
   gapMin: number;
   /** Contingency padding after the block's own duration. */
   bufferMin: number;
+  /**
+   * The shortest this block may run when the day has to be squeezed. Null or
+   * absent: it never shrinks. When a floating chain grows into a downstream
+   * anchor, the resolver takes the overrun out of the squeezable blocks in
+   * that stretch rather than reporting a clash — see core/schedule/resolve.
+   */
+  squeezeToMin?: number | null;
   lane: string;
   tags: string[];
   location: string;

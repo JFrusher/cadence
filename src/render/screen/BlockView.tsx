@@ -73,7 +73,14 @@ export function BlockView({
           </span>
         )}
         <span className={styles.times}>
-          {formatClock(entry.startMin)} · {formatDuration(block.durationMin)}
+          {formatClock(entry.startMin)} ·{" "}
+          {formatDuration(entry.contentEndMin - entry.startMin)}
+          {entry.squeezedMin > 0 && (
+            <span className={styles.squeezed} title={`Squeezed by ${entry.squeezedMin} min`}>
+              {" "}
+              ↤{formatDuration(entry.squeezedMin)}
+            </span>
+          )}
         </span>
       </button>
       {bufferWidth > 0 && (

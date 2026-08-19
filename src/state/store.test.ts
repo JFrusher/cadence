@@ -113,7 +113,35 @@ describe("document actions", () => {
   it("adds a lane once", () => {
     state().addLane("Children");
     state().addLane("Children");
+    state().addLane("  Children  ");
+    state().addLane("   ");
     expect(doc().lanes.filter((lane) => lane === "Children")).toHaveLength(1);
+    expect(doc().lanes).not.toContain("");
+  });
+
+  it("renames a lane and every block standing in it", () => {
+    state().renameLane("Suppliers", "Vendors");
+    expect(doc().lanes).toContain("Vendors");
+    expect(doc().lanes).not.toContain("Suppliers");
+    expect(doc().blocks.filter((block) => block.lane === "Suppliers")).toHaveLength(0);
+    expect(doc().blocks.some((block) => block.lane === "Vendors")).toBe(true);
+  });
+
+  it("refuses a rename onto a lane that already exists", () => {
+    const before = doc();
+    state().renameLane("Suppliers", "Transport");
+    expect(doc()).toBe(before);
+  });
+
+  it("deletes an empty lane and refuses one that still holds blocks", () => {
+    state().addLane("Children");
+    state().deleteLane("Children");
+    expect(doc().lanes).not.toContain("Children");
+
+    const before = doc();
+    state().deleteLane("Main day");
+    expect(doc()).toBe(before);
+    expect(state().notice).toContain("Main day");
   });
 });
 

@@ -56,6 +56,27 @@ export function InspectorPanel() {
         />
       </Row>
 
+      <CheckField
+        label="Can be squeezed"
+        checked={block.squeezeToMin !== null && block.squeezeToMin !== undefined}
+        onChange={(on) =>
+          updateBlock(block.id, {
+            squeezeToMin: on ? Math.max(5, Math.round(block.durationMin / 2 / 5) * 5) : null,
+          })
+        }
+      />
+      {block.squeezeToMin !== null && block.squeezeToMin !== undefined && (
+        <NumberField
+          label="Shortest it may run"
+          value={block.squeezeToMin}
+          min={0}
+          max={block.durationMin}
+          step={5}
+          suffix="min"
+          onChange={(squeezeToMin) => updateBlock(block.id, { squeezeToMin })}
+        />
+      )}
+
       <div className={styles.anchor}>
         <Button
           variant={block.anchorMin === null ? "normal" : "primary"}
@@ -136,6 +157,14 @@ export function InspectorPanel() {
           />
         ))}
       </fieldset>
+
+      {entry && entry.squeezedMin > 0 && (
+        <p className={styles.tight}>
+          Squeezed by {formatDuration(entry.squeezedMin)} to make what is anchored after it. It
+          runs {formatDuration(entry.contentEndMin - entry.startMin)}, not{" "}
+          {formatDuration(block.durationMin)}.
+        </p>
+      )}
 
       {headroom != null && (
         <p className={headroom < 0 ? styles.tight : styles.slack}>

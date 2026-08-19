@@ -49,6 +49,11 @@
   white-space: nowrap;
 }
 
+.squeezed {
+  color: var(--warn);
+  font-weight: 600;
+}
+
 .pin {
   width: 6px;
   height: 6px;

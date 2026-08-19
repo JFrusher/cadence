@@ -41,9 +41,30 @@ intact.
 
 ## Lanes
 
-Three by default: Main day, Suppliers, Transport. Lanes run independently, so
+Three to start with: Main day, Suppliers, Transport. Lanes run independently, so
 the band setting up at six does not push the wedding breakfast. Put anything
 that happens alongside the main day, rather than inside it, in its own lane.
+
+They are yours to change. **+ Lane** at the foot of the Blocks panel adds one;
+click a lane's name to rename it, and every block standing in it comes along.
+The **×** beside a lane removes it, but only once it is empty — a lane that took
+its blocks with it is an hour of the day gone quietly.
+
+## Squeeze
+
+Some blocks have give in them. Drinks can run three quarters of an hour instead
+of an hour; a ceremony cannot.
+
+Tick **Can be squeezed** in the inspector and set the shortest the block may run.
+When the blocks before an anchored one overrun it, Cadence takes the difference
+out of whatever is squeezable in that stretch — sharing it out in proportion to
+how much give each has, and never past the floor you set. Contingency is left
+alone; it is time you already set aside.
+
+The duration you typed is never edited. The timeline and every printed sheet
+show the length the block *actually* runs, with the amount taken beside it and
+an advisory in the warnings, so nothing is shortened behind your back. Overrun
+that squeezing cannot absorb is still reported as the clash it is.
 
 ## Reading the timeline
 

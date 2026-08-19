@@ -35,7 +35,11 @@ export function Timeline({ readOnly = false }: Props) {
     return preview.after.filter((entry) => moved.has(entry.id));
   }, [preview]);
 
-  const lanes = doc.lanes.filter((lane) => doc.blocks.some((block) => block.lane === lane));
+  // While editing, an empty lane still shows: a lane you just added and cannot
+  // see is a lane you cannot drop anything into. Presentation keeps it clean.
+  const lanes = readOnly
+    ? doc.lanes.filter((lane) => doc.blocks.some((block) => block.lane === lane))
+    : doc.lanes;
   const width = (toMin - fromMin) * pxPerMin;
 
   // Keep the selected block in view when the selection moves by keyboard.

@@ -10,8 +10,26 @@
 }
 
 .laneName {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
   font-size: var(--text-sm);
   font-weight: 600;
+}
+
+.laneName:hover {
+  border-color: var(--border);
+}
+
+.laneName:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  outline: none;
 }
 
 .empty {
@@ -108,6 +126,10 @@
 }
 
 .bulk {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1);
   margin-top: var(--sp-3);
   padding-top: var(--sp-2);
   border-top: 1px solid var(--border);

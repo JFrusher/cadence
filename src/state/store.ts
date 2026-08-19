@@ -95,6 +95,8 @@ export interface StoreState {
   removeTagDetail: (tag: string) => void;
   setStyle: (output: OutputId, patch: Partial<StyleSpec>) => void;
   addLane: (name: string) => void;
+  renameLane: (from: string, to: string) => void;
+  deleteLane: (name: string) => void;
 
   select: (id: string | null) => void;
   setUi: (patch: Partial<UiState>) => void;
@@ -252,7 +254,43 @@ export const useStore = create<StoreState>((set, get) => {
       })),
 
     addLane: (name) =>
-      edit((doc) => (doc.lanes.includes(name) ? doc : { ...doc, lanes: [...doc.lanes, name] })),
+      edit((doc) => {
+        const lane = name.trim();
+        return !lane || doc.lanes.includes(lane) ? doc : { ...doc, lanes: [...doc.lanes, lane] };
+      }),
+
+    renameLane: (from, to) =>
+      edit((doc) => {
+        const lane = to.trim();
+        if (!lane || lane === from || !doc.lanes.includes(from) || doc.lanes.includes(lane)) {
+          return doc;
+        }
+        return {
+          ...doc,
+          lanes: doc.lanes.map((entry) => (entry === from ? lane : entry)),
+          blocks: doc.blocks.map((block) =>
+            block.lane === from ? { ...block, lane } : block,
+          ),
+        };
+      }),
+
+    /**
+     * Refuses while the lane still holds blocks. Emptying it first is one more
+     * click; a lane that took its blocks with it is a day silently missing an
+     * hour, which is the failure this app exists to prevent.
+     */
+    deleteLane: (name) => {
+      const doc = getDoc(get());
+      if (doc.blocks.some((block) => block.lane === name)) {
+        set({ notice: `“${name}” still has blocks. Move or delete them first.` });
+        return;
+      }
+      if (doc.lanes.length <= 1) {
+        set({ notice: "A day needs at least one lane." });
+        return;
+      }
+      edit((current) => ({ ...current, lanes: current.lanes.filter((lane) => lane !== name) }));
+    },
 
     select: (id) => set({ selectedId: id }),
     setUi: (patch) => set((state) => ({ ui: { ...state.ui, ...patch } })),

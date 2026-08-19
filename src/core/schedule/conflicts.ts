@@ -1,4 +1,4 @@
-import { formatClock } from "../time/minutes";
+import { formatClock, formatDuration } from "../time/minutes";
 import type { TimelineDoc } from "../model/types";
 import { blocksById, byId, byLane, type ResolvedBlock } from "./resolve";
 
@@ -7,7 +7,8 @@ export type ConflictKind =
   | "tag-double-booked"
   | "anchor-collision"
   | "curfew-overrun"
-  | "past-golden-hour";
+  | "past-golden-hour"
+  | "squeezed";
 
 /** Conflicts block export. Advisories never do. */
 export type Severity = "conflict" | "advisory";
@@ -72,6 +73,21 @@ export function conflicts(
         message: `${lane} ends at ${formatClock(last.endMin)}, ${last.endMin - doc.day.curfewMin} minutes past the ${formatClock(doc.day.curfewMin)} curfew.`,
       });
     }
+  }
+
+  // Squeezing is never silent: a block printed shorter than it was typed says so.
+  for (const entry of resolved) {
+    if (entry.squeezedMin <= 0) continue;
+    const block = blocks.get(entry.id);
+    if (!block) continue;
+    found.push({
+      kind: "squeezed",
+      severity: "advisory",
+      blockIds: [entry.id],
+      message: `${block.label} is squeezed by ${entry.squeezedMin} minutes, to ${formatDuration(
+        entry.contentEndMin - entry.startMin,
+      )}, to make what is anchored after it.`,
+    });
   }
 
   found.push(...tagDoubleBookings(resolved, doc, label));

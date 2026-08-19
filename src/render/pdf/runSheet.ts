@@ -250,7 +250,8 @@ function measureRow(block: Block, context: MeasureContext): Row {
   const who = block.tags.map((tag) => tagLabel(context.doc, tag)).join(", ");
   const values: Record<string, string> = {
     time: entry ? formatClock(startMin) : "--:--",
-    duration: formatDuration(block.durationMin),
+    // The squeezed length, not the typed one: the sheet must agree with its own clock.
+    duration: formatDuration(entry ? entry.contentEndMin - entry.startMin : block.durationMin),
     label: block.label,
     location: block.location,
     who,

@@ -28,6 +28,22 @@ describe("renderRunSheet", () => {
     expect(text).toContain("07:00");
   });
 
+  it("prints a squeezed block at the length it actually runs", async () => {
+    const doc = sampleDoc();
+    const squeezed = {
+      ...doc,
+      blocks: doc.blocks.map((block) =>
+        block.id === "blk-drinks"
+          ? { ...block, durationMin: 135, squeezeToMin: 75 }
+          : block,
+      ),
+    };
+    const { text } = await textOf(await renderRunSheet(squeezed, options));
+    // Typed as 2h 15m, squeezed to 1h 45m by the anchor that follows it.
+    expect(text).toContain("1h 45m");
+    expect(text).not.toContain("2h 15m");
+  });
+
   it("repeats the page furniture on every page", async () => {
     const doc = sampleDoc();
     const many = {

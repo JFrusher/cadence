@@ -117,3 +117,86 @@ describe("resolve", () => {
     expect(JSON.stringify(doc)).toBe(before);
   });
 });
+
+describe("squeeze", () => {
+  it("takes an overrun out of the squeezable blocks before the next anchor", () => {
+    const resolved = byId(
+      resolve(
+        docOf([
+          block({ id: "a", anchorMin: 480, durationMin: 60 }),
+          block({ id: "b", durationMin: 60, squeezeToMin: 30 }),
+          block({ id: "c", durationMin: 60, squeezeToMin: 30 }),
+          block({ id: "d", anchorMin: 630, durationMin: 30 }),
+        ]),
+      ),
+    );
+
+    // 480 + 60 + 60 + 60 = 660, which is 30 past d's anchor. b and c have 30
+    // minutes of give each, so they lose 15 apiece and the day lands on time.
+    expect(resolved.get("b")?.squeezedMin).toBe(15);
+    expect(resolved.get("c")?.squeezedMin).toBe(15);
+    expect(resolved.get("c")?.endMin).toBe(630);
+  });
+
+  it("leaves blocks that cannot squeeze alone, and reports what it could not take", () => {
+    const resolved = byId(
+      resolve(
+        docOf([
+          block({ id: "a", anchorMin: 480, durationMin: 60 }),
+          block({ id: "b", durationMin: 60 }),
+          block({ id: "c", durationMin: 60, squeezeToMin: 50 }),
+          block({ id: "d", anchorMin: 600, durationMin: 30 }),
+        ]),
+      ),
+    );
+
+    expect(resolved.get("b")?.squeezedMin).toBe(0);
+    expect(resolved.get("c")?.squeezedMin).toBe(10);
+    // 60 minutes over, only 10 of them squeezable: the rest still collides.
+    expect(resolved.get("c")?.endMin).toBe(650);
+  });
+
+  it("never squeezes past the floor, and squeezes nothing when the day fits", () => {
+    const resolved = byId(
+      resolve(
+        docOf([
+          block({ id: "a", anchorMin: 480, durationMin: 60, squeezeToMin: 30 }),
+          block({ id: "b", durationMin: 30, squeezeToMin: 10 }),
+          block({ id: "c", anchorMin: 600, durationMin: 30 }),
+        ]),
+      ),
+    );
+    expect(resolved.get("a")?.squeezedMin).toBe(0);
+    expect(resolved.get("b")?.squeezedMin).toBe(0);
+    expect(resolved.get("b")?.endMin).toBe(570);
+  });
+
+  it("squeezes the anchored head of a stretch too, without moving its start", () => {
+    const resolved = byId(
+      resolve(
+        docOf([
+          block({ id: "a", anchorMin: 480, durationMin: 60, squeezeToMin: 40 }),
+          block({ id: "b", anchorMin: 520, durationMin: 30 }),
+        ]),
+      ),
+    );
+    expect(resolved.get("a")?.startMin).toBe(480);
+    expect(resolved.get("a")?.squeezedMin).toBe(20);
+    expect(resolved.get("a")?.endMin).toBe(520);
+  });
+
+  it("keeps the contingency buffer out of it", () => {
+    const resolved = byId(
+      resolve(
+        docOf([
+          block({ id: "a", anchorMin: 480, durationMin: 60, bufferMin: 30, squeezeToMin: 30 }),
+          block({ id: "b", anchorMin: 550, durationMin: 30 }),
+        ]),
+      ),
+    );
+    // 20 minutes over; the buffer stays 30 and the duration gives way instead.
+    expect(resolved.get("a")?.squeezedMin).toBe(20);
+    expect(resolved.get("a")?.contentEndMin).toBe(520);
+    expect(resolved.get("a")?.endMin).toBe(550);
+  });
+});

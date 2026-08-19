@@ -8,17 +8,21 @@ import type { FontBytes } from "./embedFonts";
  */
 export type FontSource = (family: string) => Promise<FontBytes>;
 
-/** Vite rewrites these to hashed same-origin URLs. Nothing leaves the machine. */
-const FONT_URLS = import.meta.glob("../../assets/fonts/*.ttf", {
-  eager: true,
-  query: "?url",
-  import: "default",
-}) as Record<string, string>;
-
-function urlFor(file: string): string {
-  const key = Object.keys(FONT_URLS).find((path) => path.endsWith(`/${file.split("/").pop()}`));
-  if (!key) throw new Error(`Bundled font missing from the build: ${file}`);
-  return FONT_URLS[key] as string;
+/**
+ * Making a PDF is the only thing this app ever puts on the network, and it is
+ * same-origin. So the one way it fails is the origin not being there: a tab
+ * left open after its dev server moved port, or a laptop that went offline
+ * after the page loaded. "Failed to fetch" tells nobody that; this does.
+ */
+async function read(url: string, family: string): Promise<Uint8Array> {
+  const response = await fetch(url).catch(() => null);
+  if (!response?.ok) {
+    throw new Error(
+      `The ${family} font could not be read from this app's own files. ` +
+        `Reload the page and try again — it was loaded from a server that is no longer answering.`,
+    );
+  }
+  return new Uint8Array(await response.arrayBuffer());
 }
 
 /** Reads bundled faces in the browser. Uploaded faces come from the blob store. */
@@ -30,13 +34,10 @@ export function browserFontSource(uploaded: Map<string, Uint8Array> = new Map())
     const bundled = BUNDLED_FONTS.find((font) => font.family === family) ?? BUNDLED_FONTS[0];
     if (!bundled) throw new Error("No fonts are bundled with this build.");
 
-    const load = async (file: string) =>
-      new Uint8Array(await (await fetch(urlFor(file))).arrayBuffer());
-
     return {
       family: bundled.family,
-      data: await load(bundled.file),
-      ...(bundled.boldFile ? { bold: await load(bundled.boldFile) } : {}),
+      data: await read(bundled.url, bundled.family),
+      ...(bundled.boldUrl ? { bold: await read(bundled.boldUrl, bundled.family) } : {}),
     };
   };
 }
