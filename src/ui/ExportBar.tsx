@@ -6,6 +6,7 @@ import { renderContactSheet } from "../render/pdf/contactSheet";
 import { browserFontSource } from "../render/pdf/fontSource";
 import { renderOrderOfDay } from "../render/pdf/orderOfDay";
 import { renderRunSheet } from "../render/pdf/runSheet";
+import { renderTimeline } from "../render/pdf/timeline";
 import { getBlob } from "../state/blobStore";
 import { getDoc, selectSchedule, useStore } from "../state/store";
 import { Button } from "./controls";
@@ -34,7 +35,7 @@ export function ExportBar() {
       ? `Fix ${blocking.length} clash${blocking.length === 1 ? "" : "es"} first — a printed sheet that contradicts itself is worse than none.`
       : null;
 
-  const download = async () => {
+  const download = async (piece: OutputId | "timeline") => {
     setBusy(true);
     try {
       const uploaded = new Map<string, Uint8Array>();
@@ -46,13 +47,15 @@ export function ExportBar() {
       const fontSource = browserFontSource(uploaded);
       const generatedOn = `Made with Cadence, ${new Date().toLocaleDateString()}`;
       const bytes =
-        output === "run-sheet"
-          ? await renderRunSheet(doc, { fontSource, generatedOn })
-          : output === "call-sheet"
-            ? await renderAllCallSheets(doc, { fontSource, generatedOn })
-            : output === "order-of-day"
-              ? await renderOrderOfDay(doc, { fontSource })
-              : await renderContactSheet(doc, { fontSource, generatedOn });
+        piece === "timeline"
+          ? await renderTimeline(doc, { fontSource, generatedOn })
+          : piece === "run-sheet"
+            ? await renderRunSheet(doc, { fontSource, generatedOn })
+            : piece === "call-sheet"
+              ? await renderAllCallSheets(doc, { fontSource, generatedOn })
+              : piece === "order-of-day"
+                ? await renderOrderOfDay(doc, { fontSource })
+                : await renderContactSheet(doc, { fontSource, generatedOn });
 
       const slug = (doc.day.coupleNames || "cadence")
         .toLowerCase()
@@ -63,7 +66,7 @@ export function ExportBar() {
       const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: "application/pdf" }));
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${slug}-${FILENAMES[output]}.pdf`;
+      link.download = `${slug}-${piece === "timeline" ? "timeline" : FILENAMES[piece]}.pdf`;
       document.body.append(link);
       link.click();
       link.remove();
@@ -93,10 +96,18 @@ export function ExportBar() {
       <Button
         variant="primary"
         disabled={busy || reason !== null}
-        onClick={() => void download()}
+        onClick={() => void download(output)}
         {...(reason === null ? {} : { title: reason })}
       >
         {busy ? "Making the PDF…" : "Download PDF"}
+      </Button>
+
+      <Button
+        disabled={busy || reason !== null}
+        onClick={() => void download("timeline")}
+        title={reason ?? "The whole day on one page, lane by lane."}
+      >
+        Download timeline
       </Button>
 
       {reason && <span className={styles.reason}>{reason}</span>}

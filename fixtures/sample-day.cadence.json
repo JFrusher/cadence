@@ -67,6 +67,24 @@
       ]
     },
     {
+      "id": "blk-rings",
+      "label": "Rings to the best man",
+      "durationMin": 0,
+      "anchorMin": 795,
+      "gapMin": 0,
+      "bufferMin": 0,
+      "lane": "Main day",
+      "tags": [
+        "registrar"
+      ],
+      "location": "Orangery",
+      "notes": "",
+      "outputs": [
+        "run-sheet",
+        "call-sheet"
+      ]
+    },
+    {
       "id": "blk-ceremony",
       "label": "Ceremony",
       "durationMin": 45,

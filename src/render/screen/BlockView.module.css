@@ -111,3 +111,71 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* A moment: no width, so the mark sits on the clock and the name hangs off it. */
+.moment {
+  width: 0;
+  overflow: visible;
+  align-items: center;
+}
+
+.marker {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: grab;
+  white-space: nowrap;
+  transform: translateX(-5px);
+}
+
+.marker:active {
+  cursor: grabbing;
+}
+
+.diamond {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  transform: rotate(45deg);
+}
+
+.markerLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 1px var(--sp-1);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--border);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.selected .diamond {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.selected .markerLabel {
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.conflict .diamond {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.advisory .diamond {
+  background: var(--warn);
+  border-color: var(--warn);
+}
+
+.ghost .diamond {
+  border-style: dashed;
+}

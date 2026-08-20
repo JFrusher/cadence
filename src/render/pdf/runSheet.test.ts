@@ -44,6 +44,12 @@ describe("renderRunSheet", () => {
     expect(text).not.toContain("2h 15m");
   });
 
+  it("prints a moment with no length to it", async () => {
+    const { text } = await textOf(await renderRunSheet(sampleDoc(), options));
+    expect(text).toContain("Rings to the best man");
+    expect(text).toContain("moment");
+  });
+
   it("repeats the page furniture on every page", async () => {
     const doc = sampleDoc();
     const many = {

@@ -1,3 +1,4 @@
+import { isMoment } from "../../core/model/types";
 import { formatClock } from "../../core/time/minutes";
 import { getDoc, selectSchedule, useStore } from "../../state/store";
 import { Button, Panel } from "../controls";
@@ -63,6 +64,13 @@ export function BlocksPanel() {
               <Button variant="quiet" onClick={() => addBlock(lane)} title={`Add a block to ${lane}`}>
                 + Add
               </Button>
+              <Button
+                variant="quiet"
+                onClick={() => addBlock(lane, { label: "New moment", durationMin: 0 })}
+                title={`Add a moment to ${lane} — a point on the clock, no length`}
+              >
+                + Moment
+              </Button>
               <button
                 type="button"
                 className={styles.icon}
@@ -94,6 +102,7 @@ export function BlocksPanel() {
                       <span className={styles.time}>
                         {entry ? formatClock(entry.startMin) : "--:--"}
                       </span>
+                      {isMoment(block) && <span className={styles.moment} title="A moment" />}
                       <span className={styles.label}>{block.label}</span>
                       {block.anchorMin !== null && <span className={styles.pin} title="Anchored" />}
                     </button>

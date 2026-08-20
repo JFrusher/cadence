@@ -67,10 +67,11 @@ describe("document actions", () => {
 
   it("reorders within a lane, stepping over blocks in other lanes", () => {
     const before = doc().blocks.filter((b) => b.lane === "Main day").map((b) => b.id);
+    const at = before.indexOf("blk-confetti");
     state().reorderBlock("blk-confetti", 1);
     const after = doc().blocks.filter((b) => b.lane === "Main day").map((b) => b.id);
-    expect(after[4]).toBe(before[5]);
-    expect(after[5]).toBe(before[4]);
+    expect(after[at]).toBe(before[at + 1]);
+    expect(after[at + 1]).toBe("blk-confetti");
   });
 
   it("does nothing reordering past the end of a lane", () => {

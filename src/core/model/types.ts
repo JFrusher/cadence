@@ -13,6 +13,7 @@ export const OUTPUT_IDS: readonly OutputId[] = [
 export interface Block {
   id: string;
   label: string;
+  /** Zero is a moment: a point on the clock rather than a stretch of it. */
   durationMin: number;
   /** Anchored: pinned to a clock time. Floating (null): starts after its predecessor. */
   anchorMin: number | null;
@@ -36,6 +37,15 @@ export interface Block {
 }
 
 /** Optional detail hung off a free-text tag. No entity management, no CRUD. */
+/**
+ * A moment is a block with no length — the rings handed over, the cake cut,
+ * the coach pulling away. It takes no time from its lane, so it can sit inside
+ * something already running without anything having to move to fit it in.
+ */
+export function isMoment(block: Pick<Block, "durationMin">): boolean {
+  return block.durationMin <= 0;
+}
+
 export interface TagDetail {
   tag: string;
   displayName?: string;

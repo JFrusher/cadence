@@ -114,6 +114,7 @@ export function sampleDoc(): TimelineDoc {
     { id: "blk-prep", label: "Bridal preparations", durationMin: 180, anchorMin: 480, location: "Bridal suite", tags: ["photographer"], notes: "Dress on by 10:30." },
     { id: "blk-travel", label: "Travel to ceremony", durationMin: 30, bufferMin: 10, location: "Courtyard" },
     { id: "blk-guests", label: "Guests arrive", durationMin: 30, anchorMin: 780, location: "Orangery", guest: true },
+    { id: "blk-rings", label: "Rings to the best man", durationMin: 0, anchorMin: 795, location: "Orangery", tags: ["registrar"] },
     { id: "blk-ceremony", label: "Ceremony", durationMin: 45, anchorMin: 810, location: "Orangery", tags: ["registrar", "photographer"], notes: "Registrar will not move this.", guest: true },
     { id: "blk-confetti", label: "Confetti", durationMin: 15, location: "Front steps", tags: ["photographer"], guest: true },
     { id: "blk-drinks", label: "Drinks reception", durationMin: 75, location: "Lawn", tags: ["caterer"], guest: true },

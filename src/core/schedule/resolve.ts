@@ -1,4 +1,4 @@
-import type { Block, TimelineDoc } from "../model/types";
+import { isMoment, type Block, type TimelineDoc } from "../model/types";
 
 export interface ResolvedBlock {
   id: string;
@@ -89,7 +89,9 @@ function lay(
     const squeezedMin = squeezed.get(block.id) ?? 0;
     const contentEndMin = startMin + block.durationMin - squeezedMin;
     const endMin = contentEndMin + block.bufferMin;
-    cursor = endMin;
+    // A moment anchored inside something already running must not drag the lane
+    // back to its own instant: what follows still follows the block it is in.
+    cursor = isMoment(block) && cursor !== undefined ? Math.max(cursor, endMin) : endMin;
 
     return {
       id: block.id,

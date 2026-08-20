@@ -3,7 +3,7 @@ import { conflictsByBlock, conflicts as computeConflicts } from "../../core/sche
 import { resolve } from "../../core/schedule/resolve";
 import { sunForDay } from "../../core/sun/solar";
 import { tagLabel } from "../../core/model/tags";
-import type { Block, TimelineDoc } from "../../core/model/types";
+import { isMoment, type Block, type TimelineDoc } from "../../core/model/types";
 import { formatClock, formatDuration } from "../../core/time/minutes";
 import { embedFamily } from "./embedFonts";
 import type { FontSource } from "./fontSource";
@@ -250,8 +250,11 @@ function measureRow(block: Block, context: MeasureContext): Row {
   const who = block.tags.map((tag) => tagLabel(context.doc, tag)).join(", ");
   const values: Record<string, string> = {
     time: entry ? formatClock(startMin) : "--:--",
-    // The squeezed length, not the typed one: the sheet must agree with its own clock.
-    duration: formatDuration(entry ? entry.contentEndMin - entry.startMin : block.durationMin),
+    // The squeezed length, not the typed one: the sheet must agree with its own
+    // clock. A moment has no length to print, so it says what it is instead.
+    duration: isMoment(block)
+      ? "moment"
+      : formatDuration(entry ? entry.contentEndMin - entry.startMin : block.durationMin),
     label: block.label,
     location: block.location,
     who,

@@ -134,3 +134,12 @@
   padding-top: var(--sp-2);
   border-top: 1px solid var(--border);
 }
+
+/* A moment has no length to show in the list, so it shows its shape instead. */
+.moment {
+  width: 6px;
+  height: 6px;
+  background: var(--text-muted);
+  transform: rotate(45deg);
+  flex: none;
+}

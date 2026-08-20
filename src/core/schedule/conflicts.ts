@@ -1,5 +1,5 @@
 import { formatClock, formatDuration } from "../time/minutes";
-import type { TimelineDoc } from "../model/types";
+import { isMoment, type TimelineDoc } from "../model/types";
 import { blocksById, byId, byLane, type ResolvedBlock } from "./resolve";
 
 export type ConflictKind =
@@ -28,6 +28,7 @@ export interface ConflictOptions {
 /** Blocks carrying this tag are photography, for the golden-hour advisory. */
 export const PHOTO_TAG = "photo";
 
+/** Strictly, so a moment — which has no length — never overlaps anything. */
 function overlaps(a: ResolvedBlock, b: ResolvedBlock): boolean {
   return a.startMin < b.endMin && b.startMin < a.endMin;
 }
@@ -41,26 +42,36 @@ export function conflicts(
   const label = (id: string) => blocks.get(id)?.label ?? id;
   const found: Conflict[] = [];
 
+  const moment = (id: string) => isMoment(blocks.get(id) ?? { durationMin: 1 });
+
   for (const [lane, entries] of byLane(resolved)) {
+    // A moment pinned inside something already running is the point of moments,
+    // not a clash: it costs the lane nothing and displaces nothing. So the scan
+    // steps over them — on both sides, or a moment sitting between two blocks
+    // would hide the collision they are actually in.
+    let previous = entries[0] && !moment(entries[0].id) ? entries[0] : undefined;
+
     for (let i = 1; i < entries.length; i += 1) {
-      const previous = entries[i - 1];
       const current = entries[i];
-      if (!previous || !current) continue;
-      if (!current.anchored || current.startMin >= previous.endMin) continue;
+      if (!current || moment(current.id)) continue;
+      const overrun = previous;
+      previous = current;
+      if (!overrun) continue;
+      if (!current.anchored || current.startMin >= overrun.endMin) continue;
 
       // Both fixed and overlapping is a plain collision. A floating chain that
       // has grown into a downstream anchor is a different problem with a
       // different fix, so it gets its own kind.
-      const kind: ConflictKind = previous.anchored ? "lane-overlap" : "anchor-collision";
-      const overlapMin = previous.endMin - current.startMin;
+      const kind: ConflictKind = overrun.anchored ? "lane-overlap" : "anchor-collision";
+      const overlapMin = overrun.endMin - current.startMin;
       found.push({
         kind,
         severity: "conflict",
-        blockIds: [previous.id, current.id],
+        blockIds: [overrun.id, current.id],
         message:
           kind === "lane-overlap"
-            ? `${label(previous.id)} runs until ${formatClock(previous.endMin)}, ${overlapMin} minutes past the start of ${label(current.id)} in ${lane}.`
-            : `${label(previous.id)} overruns into ${label(current.id)} at ${formatClock(current.startMin)} by ${overlapMin} minutes. Shorten something earlier in ${lane}.`,
+            ? `${label(overrun.id)} runs until ${formatClock(overrun.endMin)}, ${overlapMin} minutes past the start of ${label(current.id)} in ${lane}.`
+            : `${label(overrun.id)} overruns into ${label(current.id)} at ${formatClock(current.startMin)} by ${overlapMin} minutes. Shorten something earlier in ${lane}.`,
       });
     }
 
@@ -120,6 +131,7 @@ function tagDoubleBookings(
   label: (id: string) => string,
 ): Conflict[] {
   const positions = byId(resolved);
+  const lengths = blocksById(doc);
   const byTag = new Map<string, ResolvedBlock[]>();
   for (const block of doc.blocks) {
     const entry = positions.get(block.id);
@@ -138,11 +150,19 @@ function tagDoubleBookings(
         const a = entries[i];
         const b = entries[j];
         if (!a || !b || a.lane === b.lane || !overlaps(a, b)) continue;
+        // A moment inside something else is a person stepping away for a
+        // minute, not a person in two places: worth saying, never worth
+        // blocking the print run over.
+        const point =
+          isMoment(lengths.get(a.id) ?? { durationMin: 1 }) ||
+          isMoment(lengths.get(b.id) ?? { durationMin: 1 });
         found.push({
           kind: "tag-double-booked",
-          severity: "conflict",
+          severity: point ? "advisory" : "conflict",
           blockIds: [a.id, b.id],
-          message: `${tag} is in two places at ${formatClock(Math.max(a.startMin, b.startMin))} — ${label(a.id)} and ${label(b.id)}.`,
+          message: point
+            ? `${tag} is wanted at ${label(a.id)} and ${label(b.id)} at ${formatClock(Math.max(a.startMin, b.startMin))}. One of them is a moment, so it may well be fine.`
+            : `${tag} is in two places at ${formatClock(Math.max(a.startMin, b.startMin))} — ${label(a.id)} and ${label(b.id)}.`,
         });
       }
     }

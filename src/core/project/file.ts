@@ -72,14 +72,18 @@ function validate(raw: RawDoc): string | null {
   return null;
 }
 
-/** `charis-and-jacob.cadence.json`, or a sensible fallback. */
-export function suggestedFilename(doc: TimelineDoc): string {
-  const slug = doc.day.coupleNames
+/** `charis-and-jacob` — the couple's names, fit for a filename. May be empty. */
+export function slugFor(doc: TimelineDoc): string {
+  return doc.day.coupleNames
     .toLowerCase()
     .replace(/&/g, "and")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
-  return `${slug || "cadence-day"}${FILE_EXTENSION}`;
+}
+
+/** `charis-and-jacob.cadence.json`, or a sensible fallback. */
+export function suggestedFilename(doc: TimelineDoc): string {
+  return `${slugFor(doc) || "cadence-day"}${FILE_EXTENSION}`;
 }
 
 export { SCHEMA_VERSION };

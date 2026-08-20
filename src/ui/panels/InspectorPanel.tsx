@@ -1,4 +1,4 @@
-import { OUTPUT_IDS, type OutputId } from "../../core/model/types";
+import { isMoment, OUTPUT_IDS, type OutputId } from "../../core/model/types";
 import { formatClock, formatDuration } from "../../core/time/minutes";
 import { getDoc, selectSchedule, useStore } from "../../state/store";
 import {
@@ -32,20 +32,33 @@ export function InspectorPanel() {
 
   const entry = schedule.positions.get(block.id);
   const headroom = schedule.slack.byBlock.get(block.id);
+  const moment = isMoment(block);
 
   return (
     <Panel title="Block">
       <TextField label="Label" value={block.label} onChange={(label) => updateBlock(block.id, { label })} />
 
+      <CheckField
+        label="A moment, not a stretch"
+        checked={moment}
+        onChange={(on) =>
+          // Off again lands on the default block length: the typed one is gone,
+          // and guessing at it is worse than a number the user can see and fix.
+          updateBlock(block.id, on ? { durationMin: 0, squeezeToMin: null } : { durationMin: 30 })
+        }
+      />
+
       <Row>
-        <NumberField
-          label="Duration"
-          value={block.durationMin}
-          min={0}
-          step={5}
-          suffix="min"
-          onChange={(durationMin) => updateBlock(block.id, { durationMin })}
-        />
+        {!moment && (
+          <NumberField
+            label="Duration"
+            value={block.durationMin}
+            min={0}
+            step={5}
+            suffix="min"
+            onChange={(durationMin) => updateBlock(block.id, { durationMin })}
+          />
+        )}
         <NumberField
           label="Contingency"
           value={block.bufferMin}
@@ -56,6 +69,7 @@ export function InspectorPanel() {
         />
       </Row>
 
+      {!moment && (
       <CheckField
         label="Can be squeezed"
         checked={block.squeezeToMin !== null && block.squeezeToMin !== undefined}
@@ -65,7 +79,8 @@ export function InspectorPanel() {
           })
         }
       />
-      {block.squeezeToMin !== null && block.squeezeToMin !== undefined && (
+      )}
+      {!moment && block.squeezeToMin !== null && block.squeezeToMin !== undefined && (
         <NumberField
           label="Shortest it may run"
           value={block.squeezeToMin}
@@ -90,7 +105,7 @@ export function InspectorPanel() {
           {block.anchorMin === null ? "Anchor to the clock" : "Anchored"}
         </Button>
         <span className={styles.resolved}>
-          {entry ? `${formatClock(entry.startMin)} – ${formatClock(entry.endMin)}` : ""}
+          {!entry ? "" : moment ? formatClock(entry.startMin) : `${formatClock(entry.startMin)} – ${formatClock(entry.endMin)}`}
         </span>
       </div>
 

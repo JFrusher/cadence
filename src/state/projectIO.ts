@@ -1,14 +1,29 @@
+import { serialiseDay, suggestedDayFilename } from "../core/project/day";
 import { parse, serialise, suggestedFilename } from "../core/project/file";
 import type { TimelineDoc } from "../core/model/types";
 import { missingKeys, type BlobBackend } from "./blobStore";
 
 /** Downloads the document as a `.cadence.json` file. */
 export function saveProject(doc: TimelineDoc): void {
-  const blob = new Blob([serialise(doc)], { type: "application/json" });
+  download(serialise(doc), suggestedFilename(doc));
+}
+
+/**
+ * Downloads the day with its clock times worked out, as a `.day.json` — the
+ * file another tool reads. It is an export, not a project file: opening it
+ * back into Cadence is not a thing, because the anchors and gaps that make the
+ * day editable are not in it.
+ */
+export function saveDay(doc: TimelineDoc): void {
+  download(serialiseDay(doc), suggestedDayFilename(doc));
+}
+
+function download(text: string, filename: string): void {
+  const blob = new Blob([text], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = suggestedFilename(doc);
+  link.download = filename;
   document.body.append(link);
   link.click();
   link.remove();

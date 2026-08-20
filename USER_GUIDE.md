@@ -66,6 +66,25 @@ show the length the block *actually* runs, with the amount taken beside it and
 an advisory in the warnings, so nothing is shortened behind your back. Overrun
 that squeezing cannot absorb is still reported as the clash it is.
 
+## Moments
+
+Some things on a day have no length: the rings handed to the best man, the cake
+cut, the coach pulling away. Tick **A moment, not a stretch** in the block
+panel, or press **+ Moment** on a lane, and the block becomes a point on the
+clock instead of a box.
+
+A moment costs its lane nothing. Whatever follows it carries on from the block
+it sits inside, so you can pin one in the middle of something already running
+without anything having to move — and that is not reported as a clash. A
+supplier wanted at a moment and at a block elsewhere raises an advisory rather
+than a clash, because a person can step away for a minute; it never blocks the
+print run.
+
+On screen a moment is a diamond with its name beside it. On the run-sheet its
+length reads *moment*; on the timeline it is a rule drawn across its lane with
+the time and the name on it. Turning the tick off again gives the block the
+default thirty minutes back — the length you first typed is gone, so check it.
+
 ## Reading the timeline
 
 Blocks sit to scale against the ruler. The hatched tail on a block is its
@@ -114,6 +133,17 @@ time and notes. Those details drive the call sheets and the contact sheet.
 Take a tag off its last block and Cadence keeps the details, listed under *no
 longer on any block* — the phone number is the part that is hard to get back.
 
+## Handing the day to another tool
+
+**Export day** writes a `.day.json`: the whole day with its clock times already
+worked out, block by block, plus the tag details as teams. It is what Brigade —
+the jobs and crew tool — reads, so that the work of deciding when things happen
+stays here and is never done twice.
+
+It is an export, not a project file. The anchors, gaps and squeeze floors that
+make the day editable are not in it, so there is nothing to open back into
+Cadence. Change the day here, export again, and the other tool reconciles.
+
 ## Printing
 
 Pick a piece in the export bar and press **Download PDF**.
@@ -121,6 +151,15 @@ Pick a piece in the export bar and press **Download PDF**.
 **Master run-sheet.** Every block that opts in, in clock order across all
 lanes, with times, durations, locations, who is needed and notes. Clashes are
 flagged in the margin. This is the coordinator's document.
+
+**Timeline.** One A4, time running down the page, a column per lane, and every
+block drawn to length in its lane's tint. It carries whatever is on the master
+run-sheet, so there is nothing extra to tick. Press **Download timeline** in the
+export bar. The scale bends to fit the day on the sheet, however long the day
+runs; past four lanes it continues on a second page. A block too short to hold
+its own name is drawn at the shortest readable height and the blocks under it
+shuffle down a millimetre or two, catching up again at the next gap — the
+printed clock inside each box is always the true one.
 
 **Call sheets.** The same layout filtered to one tag, headed with that
 supplier's name, arrival and number. Exports as one PDF with a page per

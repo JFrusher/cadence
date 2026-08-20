@@ -21,12 +21,17 @@ leave your machine.
 - **Sunset, worked out offline.** Enter the venue's coordinates and the day's
   UTC offset and Cadence knows when the light goes, and says so when the
   portraits have drifted past it. No network, no timezone database.
-- **Four printed pieces.** A master run-sheet, a call sheet per supplier, a
-  guest-facing order of the day, and a contact sheet of who to ring.
+- **Five printed pieces.** A master run-sheet, a call sheet per supplier, a
+  guest-facing order of the day, a contact sheet of who to ring, and a
+  one-page timeline: the whole day to scale, a column per lane.
+- **Moments as well as stretches.** A block with no length — the rings handed
+  over, the cake cut — sits on the clock as a mark rather than a box, takes no
+  time from its lane, and can be pinned inside something already running.
 - **Vector PDFs with embedded fonts.** Text stays text — selectable, sharp,
   and the same on the print shop's machine as on yours.
 - **One file.** Save the whole day as a `.cadence.json` you can move between
-  machines.
+  machines, or export a `.day.json` with the times worked out for another tool
+  to read.
 
 Desktop only. A wedding day is twelve hours wide and does not read on a phone.
 
@@ -55,7 +60,7 @@ src/core/      pure TypeScript, no React, every module with a colocated test
   sun/         NOAA solar position
   project/     .cadence.json read, write and migrate
 src/render/
-  pdf/         the four printed pieces
+  pdf/         the five printed pieces
   screen/      the timeline and presentation mode
 src/state/     store, history, autosave, blob store, fonts
 src/ui/        panels and chrome

@@ -1,6 +1,6 @@
 import type { Conflict } from "../../core/schedule/conflicts";
 import type { ResolvedBlock } from "../../core/schedule/resolve";
-import type { Block } from "../../core/model/types";
+import { isMoment, type Block } from "../../core/model/types";
 import { formatClock, formatDuration } from "../../core/time/minutes";
 import styles from "./BlockView.module.css";
 
@@ -38,8 +38,11 @@ export function BlockView({
       ? "advisory"
       : null;
 
+  const moment = isMoment(block);
+
   const className = [
     styles.block,
+    moment ? styles.moment : "",
     selected ? styles.selected : "",
     ghost ? styles.ghost : "",
     severity === "conflict" ? styles.conflict : "",
@@ -47,6 +50,39 @@ export function BlockView({
   ]
     .filter(Boolean)
     .join(" ");
+
+  // A moment has no width to put anything in, so it becomes a mark on the
+  // clock with its name beside it — the same object, drawn as a point.
+  if (moment) {
+    return (
+      <div className={className} style={{ left }}>
+        <button
+          type="button"
+          className={styles.marker}
+          aria-pressed={selected}
+          tabIndex={ghost ? -1 : 0}
+          onClick={() => onSelect?.(block.id)}
+          onPointerDown={(event) => {
+            if (ghost || event.button !== 0) return;
+            onSelect?.(block.id);
+            onDragStart?.(block.id, event.clientX);
+          }}
+        >
+          <span className={styles.diamond} />
+          <span className={styles.markerLabel}>
+            {entry.anchored && <span className={styles.pin} aria-label="Anchored" />}
+            {block.label}
+            <span className={styles.times}>{formatClock(entry.startMin)}</span>
+          </span>
+          {severity && (
+            <span className={styles.assistive}>
+              {severity === "conflict" ? "Has a clash" : "Has an advisory"}
+            </span>
+          )}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className={className} style={{ left, width: contentWidth + bufferWidth }}>

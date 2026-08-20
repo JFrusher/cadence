@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { emptyDoc, sampleDoc } from "../core/model/defaults";
-import { openProject, saveProject } from "../state/projectIO";
+import { openProject, saveDay, saveProject } from "../state/projectIO";
 import { getDoc, useStore } from "../state/store";
 import styles from "./ProjectButtons.module.css";
 
@@ -32,6 +32,14 @@ export function ProjectButtons() {
       </button>
       <button type="button" className={styles.button} onClick={() => input.current?.click()}>
         Open day
+      </button>
+      <button
+        type="button"
+        className={styles.button}
+        onClick={() => saveDay(doc)}
+        title="Export the day with its times worked out, for another tool to read"
+      >
+        Export day
       </button>
       <button
         type="button"
