@@ -5,33 +5,29 @@ runs it. Everything happens in your browser — no account, no upload, no
 server. The schedule, the phone numbers and the guest-facing pieces never
 leave your machine.
 
-- **Hybrid scheduling.** Every block has a duration. A block is either
-  *anchored* to a clock time — the registrar will not move — or *floating*,
-  starting when the one before it ends. Move anything and everything
-  downstream follows.
-- **It tells you when the day does not fit.** Two anchored blocks overlapping,
-  a supplier in two places at once, a floating chain that has grown into the
-  first dance, a finish past the curfew.
-- **Slack, not just clashes.** Per-block contingency, headroom to the next
-  anchor, and minutes left before curfew in the header — the number a
-  coordinator actually runs the day on.
-- **What-if before you commit.** Drag a block and every downstream block
-  ghosts to where it would land, with any new clash lit up. Release to keep
-  it, Escape to put it back.
-- **Sunset, worked out offline.** Enter the venue's coordinates and the day's
-  UTC offset and Cadence knows when the light goes, and says so when the
-  portraits have drifted past it. No network, no timezone database.
-- **Five printed pieces.** A master run-sheet, a call sheet per supplier, a
+Every block has a duration. A block is either *anchored* to a clock time — the
+registrar will not move — or *floating*, starting when the one before it ends.
+Move anything and everything downstream follows. Cadence flags what no longer
+fits: two anchored blocks overlapping, a supplier in two places at once, a
+floating chain that has grown into the first dance, a finish past the curfew.
+It tracks slack too — per-block contingency, headroom to the next anchor, and
+minutes left before curfew in the header.
+
+- Drag a block and every downstream block ghosts to where it would land, with
+  any new clash lit up. Release to keep it, Escape to put it back.
+- Enter the venue's coordinates and the day's UTC offset and Cadence works out
+  when the light goes, then says so when the portraits have drifted past it.
+  No network, no timezone database.
+- Five printed pieces: a master run-sheet, a call sheet per supplier, a
   guest-facing order of the day, a contact sheet of who to ring, and a
-  one-page timeline: the whole day to scale, a column per lane.
-- **Moments as well as stretches.** A block with no length — the rings handed
-  over, the cake cut — sits on the clock as a mark rather than a box, takes no
-  time from its lane, and can be pinned inside something already running.
-- **Vector PDFs with embedded fonts.** Text stays text — selectable, sharp,
-  and the same on the print shop's machine as on yours.
-- **One file.** Save the whole day as a `.cadence.json` you can move between
-  machines, or export a `.day.json` with the times worked out for another tool
-  to read.
+  one-page timeline — the whole day to scale, a column per lane.
+- A block with no length — the rings handed over, the cake cut — sits on the
+  clock as a mark rather than a box, takes no time from its lane, and can be
+  pinned inside something already running.
+- Vector PDFs with embedded fonts. Text stays text: selectable, sharp, and the
+  same on the print shop's machine as on yours.
+- Save the whole day as a `.cadence.json` you can move between machines, or
+  export a `.day.json` with the times worked out for another tool to read.
 
 Desktop only. A wedding day is twelve hours wide and does not read on a phone.
 
