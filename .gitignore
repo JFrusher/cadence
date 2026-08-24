@@ -7,3 +7,6 @@ tsconfig.tsbuildinfo
 
 # Session transcripts. Real names end up in these.
 .remember/
+
+# Cloud-synced local state (symlinked to OneDrive)
+state.json
