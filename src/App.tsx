@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Presentation } from "./render/screen/Presentation";
 import { Timeline } from "./render/screen/Timeline";
+import { serialise } from "./core/project/file";
 import { formatDuration } from "./core/time/minutes";
 import { restoreFonts } from "./state/fontLoader";
 import { createPersister, restore } from "./state/persist";
@@ -14,6 +15,7 @@ import { ExportBar } from "./ui/ExportBar";
 import { ProjectButtons } from "./ui/ProjectButtons";
 import { Sidebar } from "./ui/Sidebar";
 import { WarningsList } from "./ui/WarningsList";
+import { write as writeLinkedFile } from "./state/fileSink";
 import styles from "./App.module.css";
 
 const persister = createPersister();
@@ -42,8 +44,12 @@ export function App() {
   }, [setNotice]);
 
   // Autosave, debounced, and flushed if the window goes away mid-edit.
+  // localStorage is the source of truth for this browser; the linked file, when
+  // there is one, is a second write so a synced folder always holds the current
+  // day. A failure there never loses work, so it is not worth interrupting for.
   useEffect(() => {
     persister.schedule(doc);
+    void writeLinkedFile(serialise(doc));
   }, [doc]);
   useEffect(() => {
     const flush = () => persister.flush();

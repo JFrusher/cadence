@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { emptyDoc, sampleDoc } from "../core/model/defaults";
 import { openProject, saveDay, saveProject } from "../state/projectIO";
 import { getDoc, useStore } from "../state/store";
+import { LinkedFileButton } from "./LinkedFileButton";
 import styles from "./ProjectButtons.module.css";
 
 export function ProjectButtons() {
@@ -54,6 +55,7 @@ export function ProjectButtons() {
       <button type="button" className={styles.button} onClick={() => loadDoc(sampleDoc())}>
         Sample day
       </button>
+      <LinkedFileButton />
       <input
         ref={input}
         type="file"
