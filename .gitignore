@@ -4,3 +4,6 @@ dist
 .DS_Store
 tsconfig.tsbuildinfo
 *.pdf
+
+# Session transcripts. Real names end up in these.
+.remember/
